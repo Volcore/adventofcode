@@ -9,15 +9,15 @@ import (
 
 var day01cmd = &cobra.Command{
 	Use: "day01",
-	Run: run,
+	Run: run01,
 }
 
 func init() {
 	RootCmd.AddCommand(day01cmd)
 }
 
-func compute(input string) int {
-	fmt.Println("Input is: ", input)
+func compute01(input string) int {
+	fmt.Println("Input is:\n", input)
 	last := input[len(input)-1]
 	count := 0
 	for i := 0; i < len(input); i++ {
@@ -31,22 +31,21 @@ func compute(input string) int {
 	return count
 }
 
-func test(input string, output int) {
-	val := compute(input)
+func test01(input string, output int) {
+	val := compute01(input)
 	if val != output {
 		fmt.Println("Test failed, value should be", output, "but is", val)
 	}
 }
 
-func run(cmd *cobra.Command, args []string) {
-	test("1122", 3)
-	test("1111", 4)
-	test("1234", 0)
-	test("91212129", 9)
+func run01(cmd *cobra.Command, args []string) {
+	test01("1122", 3)
+	test01("1111", 4)
+	test01("1234", 0)
+	test01("91212129", 9)
 	b, err := ioutil.ReadFile("data/01-input.txt")
 	if err == nil {
 		input := strings.Trim(string(b), "\n\r \t")
-		compute(input)
+		compute01(input)
 	}
-
 }
