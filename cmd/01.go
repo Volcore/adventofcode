@@ -3,8 +3,6 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"io/ioutil"
-	"strings"
 )
 
 var day01cmd = &cobra.Command{
@@ -17,7 +15,6 @@ func init() {
 }
 
 func compute01(input string) int {
-	fmt.Println("Input is:\n", input)
 	last := input[len(input)-1]
 	count := 0
 	for i := 0; i < len(input); i++ {
@@ -27,7 +24,7 @@ func compute01(input string) int {
 		}
 		last = val
 	}
-	fmt.Println("Count is: ", count)
+	PrintResult(input, count)
 	return count
 }
 
@@ -38,14 +35,38 @@ func test01(input string, output int) {
 	}
 }
 
+func compute01b(input string) int {
+	l := len(input)
+	count := 0
+	for i := 0; i < len(input); i++ {
+		val1 := input[i]
+		val2 := input[(i+l/2)%l]
+		if val1 == val2 {
+			count += int(val1 - '0')
+		}
+	}
+	PrintResult(input, count)
+	return count
+}
+
+func test01b(input string, output int) {
+	val := compute01b(input)
+	if val != output {
+		fmt.Println("Test failed, value should be", output, "but is", val)
+	}
+}
+
 func run01(cmd *cobra.Command, args []string) {
+	input := LoadData("data/01-input.txt")
 	test01("1122", 3)
 	test01("1111", 4)
 	test01("1234", 0)
 	test01("91212129", 9)
-	b, err := ioutil.ReadFile("data/01-input.txt")
-	if err == nil {
-		input := strings.Trim(string(b), "\n\r \t")
-		compute01(input)
-	}
+	compute01(input)
+	test01b("1212", 6)
+	test01b("1221", 0)
+	test01b("123425", 4)
+	test01b("123123", 12)
+	test01b("12131415", 4)
+	compute01b(input)
 }
