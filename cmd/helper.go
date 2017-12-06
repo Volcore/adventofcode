@@ -49,3 +49,11 @@ func ParseIntArray(input string) []int {
 	}
 	return iarray
 }
+
+func Test(f func(string) int, input string, output int) {
+	res := f(input)
+	PrintResult(input, res)
+	if res != output {
+		fmt.Println("Test failed, value should be", output, "but is", res)
+	}
+}
