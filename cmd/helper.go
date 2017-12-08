@@ -27,6 +27,16 @@ func SortString(w string) string {
 
 func PrintResult(input string, output int) {
 	// Crop input and output
+	input = strings.Replace(input, "\n", " ", -1)
+	if len(input) > 50 {
+		input = input[:50] + "..."
+	}
+	fmt.Println(input, "=>", output)
+}
+
+func PrintResultS(input string, output string) {
+	// Crop input and output
+	input = strings.Replace(input, "\n", " ", -1)
 	if len(input) > 50 {
 		input = input[:50] + "..."
 	}
@@ -53,6 +63,14 @@ func ParseIntArray(input string) []int {
 func Test(f func(string) int, input string, output int) {
 	res := f(input)
 	PrintResult(input, res)
+	if res != output {
+		fmt.Println("Test failed, value should be", output, "but is", res)
+	}
+}
+
+func TestS(f func(string) string, input string, output string) {
+	res := f(input)
+	PrintResultS(input, res)
 	if res != output {
 		fmt.Println("Test failed, value should be", output, "but is", res)
 	}
