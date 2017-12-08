@@ -57,3 +57,7 @@ func Test(f func(string) int, input string, output int) {
 		fmt.Println("Test failed, value should be", output, "but is", res)
 	}
 }
+
+func PrintIntArray(array []int) string {
+	return fmt.Sprint(array)
+}
