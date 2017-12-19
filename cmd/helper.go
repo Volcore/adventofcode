@@ -51,6 +51,14 @@ func LoadData(path string) string {
 	return strings.Trim(string(b), "\n\r \t")
 }
 
+func LoadDataRaw(path string) string {
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		panic("Input " + path + " not found!")
+	}
+	return string(b)
+}
+
 func ParseIntArray(input string) []int {
 	sarray := strings.Split(input, " ")
 	iarray := make([]int, len(sarray))
