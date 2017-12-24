@@ -40,7 +40,7 @@ func print21(pattern []bool) {
 			fmt.Print(".")
 		}
 	}
-	fmt.Print(" ")
+	fmt.Println("")
 }
 
 func printTiles21(tiles [][]bool) {
@@ -104,20 +104,18 @@ func mutate21(tile []bool) [][]bool {
 
 func split21(tile []bool) [][]bool {
 	if len(tile) == 16 {
-		// 0 1 2 3
-		// 4 5 6 7
-		// 8 9 10 11
-		// 12 13 14 15
-		// create 2x2 grid of 2x2 tiles
 		return [][]bool{
-			[]bool{tile[0], tile[1], tile[4], tile[5]},
-			[]bool{tile[2], tile[3], tile[6], tile[7]},
-			[]bool{tile[8], tile[9], tile[12], tile[13]},
-			[]bool{tile[10], tile[11], tile[14], tile[15]},
+			tile[0:4],
+			tile[4:8],
+			tile[8:12],
+			tile[12:16],
 		}
 	} else {
-		// return single 3x3 grid
-		return [][]bool{tile}
+		return [][]bool{
+			tile[0:3],
+			tile[3:6],
+			tile[6:9],
+		}
 	}
 }
 
@@ -131,41 +129,66 @@ func parse21(input string) []*pattern21 {
 		p.patterns = mutate21(parseTile21(parts[0]))
 		p.output = split21(parseTile21(parts[1]))
 		patterns = append(patterns, p)
-		//fmt.Println(line)
-		//printTiles21(p.patterns)
-		//printTiles21(p.output)
 	}
 	return patterns
 }
 
-// ##./#.#/#.. => #.../###./#.##/#.##
-
 func step21(grid [][]bool, patterns []*pattern21) [][]bool {
+	size := len(grid)
+	tileSize := 2
+	if size%2 == 0 {
+		tileSize = 2
+	} else {
+		tileSize = 3
+	}
 	newgrid := [][]bool{}
-	for _, tile := range grid {
-		// find match in patterns
-		found := false
-		for _, pattern := range patterns {
-			for _, cmp := range pattern.patterns {
-				if TestBoolSliceEqual(cmp, tile) {
-					newgrid = append(newgrid, pattern.output...)
-					found = true
+	for y := 0; y < size/tileSize; y++ {
+		rows := [][]bool{
+			[]bool{},
+			[]bool{},
+			[]bool{},
+			[]bool{},
+		}
+		for x := 0; x < size/tileSize; x++ {
+			// build the tile
+			tile := make([]bool, tileSize*tileSize)
+			for j := 0; j < tileSize; j++ {
+				for i := 0; i < tileSize; i++ {
+					tile[i+j*tileSize] = grid[y*tileSize+j][x*tileSize+i]
+				}
+			}
+			// Match the tile
+			found := false
+			for _, pattern := range patterns {
+				for _, cmp := range pattern.patterns {
+					if TestBoolSliceEqual(cmp, tile) {
+						for idx, output := range pattern.output {
+							rows[idx] = append(rows[idx], output...)
+						}
+						found = true
+						break
+					}
+				}
+				if found {
 					break
 				}
 			}
-			if found {
-				break
+			if !found {
+				panic("Pattern without match!")
 			}
 		}
-		if !found {
-			panic("Pattern without match!")
+		for _, row := range rows {
+			if len(row) == 0 {
+				break
+			}
+			newgrid = append(newgrid, row)
 		}
 	}
 	return newgrid
 }
 
 func printGrid21(grid [][]bool) {
-	fmt.Println("Grid")
+	fmt.Println("*** Grid")
 	for _, tile := range grid {
 		print21(tile)
 	}
@@ -174,13 +197,18 @@ func printGrid21(grid [][]bool) {
 
 func compute21a(input string, depth int) int {
 	patterns := parse21(input)
-	grid := [][]bool{[]bool{false, true, false, false, false, true, true, true, true}}
+	grid := [][]bool{
+		[]bool{false, true, false},
+		[]bool{false, false, true},
+		[]bool{true, true, true},
+	}
 	// Simulate
 	for i := 0; i < depth; i++ {
-		// Shit i misunderstood the specs... GG
-		printGrid21(grid)
+		fmt.Println("Depth", i, "/", depth)
+		//printGrid21(grid)
 		grid = step21(grid, patterns)
 	}
+	//printGrid21(grid)
 	// Count result
 	count := 0
 	for _, tile := range grid {
@@ -210,5 +238,5 @@ func run21(cmd *cobra.Command, args []string) {
 	test := LoadDataRaw("data/21-test.txt")
 	Test(compute21a2, test, 12)
 	PrintResult(input, compute21a5(input))
-	//PrintResult(input, compute21a18(input))
+	PrintResult(input, compute21a18(input))
 }
