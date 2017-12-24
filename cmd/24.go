@@ -55,7 +55,7 @@ func slice24(comps []*comp24, i int) []*comp24 {
 	return append(append([]*comp24{}, comps[:i]...), comps[i+1:]...)
 }
 
-func recurse24(comps []*comp24, sum int, next int) int {
+func recurse24a(comps []*comp24, sum int, next int) int {
 	// find all matches
 	max := sum
 	for idx, comp := range comps {
@@ -63,7 +63,7 @@ func recurse24(comps []*comp24, sum int, next int) int {
 			continue
 		}
 		other := comp.otherValue(next)
-		val := recurse24(slice24(comps, idx), sum+next+other, other)
+		val := recurse24a(slice24(comps, idx), sum+next+other, other)
 		if val > max {
 			max = val
 		}
@@ -73,7 +73,31 @@ func recurse24(comps []*comp24, sum int, next int) int {
 
 func compute24a(input string) int {
 	comps := parse24(input)
-	return recurse24(comps, 0, 0)
+	return recurse24a(comps, 0, 0)
+}
+
+func recurse24b(comps []*comp24, sum int, next int) (int, int) {
+	// find all matches
+	max := 0
+	maxStr := sum
+	for idx, comp := range comps {
+		if !comp.isOfValue(next) {
+			continue
+		}
+		other := comp.otherValue(next)
+		length, strength := recurse24b(slice24(comps, idx), sum+next+other, other)
+		if length > max || (length == max && strength > maxStr) {
+			max = length
+			maxStr = strength
+		}
+	}
+	return max + 1, maxStr
+}
+
+func compute24b(input string) int {
+	comps := parse24(input)
+	_, strength := recurse24b(comps, 0, 0)
+	return strength
 }
 
 func run24(cmd *cobra.Command, args []string) {
@@ -81,4 +105,6 @@ func run24(cmd *cobra.Command, args []string) {
 	Test(compute24a, test, 31)
 	input := LoadDataRaw("data/24-input.txt")
 	PrintResult(input, compute24a(input))
+	Test(compute24b, test, 19)
+	PrintResult(input, compute24b(input))
 }
