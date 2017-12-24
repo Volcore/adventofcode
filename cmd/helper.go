@@ -97,3 +97,25 @@ func HexToInt(c int) int {
 func PrintIntArray(array []int) string {
 	return fmt.Sprint(array)
 }
+
+func TestBoolSliceEqual(a, b []bool) bool {
+	if a == nil && b == nil {
+		return true
+	}
+
+	if a == nil || b == nil {
+		return false
+	}
+
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
+}
